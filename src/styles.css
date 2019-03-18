@@ -1,0 +1,21 @@
+body {
+    display: grid;
+    grid-template-columns: 20vw 30vw 30vw 20vw;
+    grid-template-rows: auto;
+    grid-template-areas:
+        "header header header header"
+        "r-sidebar main main l-sidebar"
+        "footer footer footer footer";
+}
+
+.header {
+    grid-area: header;
+    place-self: center;
+}
+
+.skjema {
+    margin: auto;
+    grid-area: main;
+    display: flex;
+    flex-direction: column;
+}
