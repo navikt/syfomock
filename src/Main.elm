@@ -2,7 +2,6 @@ module Main exposing (main)
 
 import Browser
 import Browser.Navigation as Nav
-import Debug exposing (log)
 import Html exposing (..)
 import Html.Attributes exposing (class, placeholder, style, type_, value)
 import Html.Events exposing (onInput, onSubmit)
@@ -95,7 +94,7 @@ update msg model =
             ( { model | fnr = fnr }, Cmd.none )
 
         StartDato startDato ->
-            ( { model | startDato = log "startdato" startDato }, Cmd.none )
+            ( { model | startDato = startDato }, Cmd.none )
 
         SluttDato sluttDato ->
             ( { model | sluttDato = sluttDato }, Cmd.none )
