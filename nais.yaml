@@ -6,7 +6,7 @@ metadata:
   labels:
     team: teamsykefravr
 spec:
-  image: repo.adeo.no:5443/syfo/syfomock:latest
+  image: repo.adeo.no:5443/syfo/syfomock:{{VERSION}}
   port: 8080
   team: teamsykefravr
   liveness:
