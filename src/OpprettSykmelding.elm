@@ -1,6 +1,6 @@
 module OpprettSykmelding exposing (lagSykmeldingBestilling, postNySykmelding, sykmeldingBestillingEncoder, sykmeldingForm, sykmeldingsperiodeEncoder, sykmeldingstypeEncoder)
 
-import Felleskomponenter exposing (skjemaElement)
+import Felleskomponenter exposing (lagMockUrl, skjemaElement)
 import Html exposing (Html, button, div, form, text)
 import Html.Attributes exposing (class)
 import Html.Events exposing (onSubmit)
@@ -31,7 +31,7 @@ postNySykmelding bestilling =
                 |> Http.jsonBody
     in
     post
-        { url = "https://httpbin.org/post"
+        { url = lagMockUrl "/sykmelding"
         , body = body
         , expect = Http.expectJson SykmeldingSendt (Decode.list Decode.string)
         }
