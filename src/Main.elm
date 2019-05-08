@@ -3,7 +3,7 @@ module Main exposing (main)
 import Browser
 import Browser.Navigation as Nav
 import Html exposing (..)
-import Html.Attributes exposing (class, placeholder, style, type_, value)
+import Html.Attributes exposing (class, style, type_, value)
 import Html.Events exposing (onInput, onSubmit)
 import Http exposing (post)
 import Json.Decode as Decode
@@ -16,7 +16,22 @@ type alias Model =
     { fnr : String
     , startDato : String
     , sluttDato : String
+    , nullstillBruker : NullstillBrukerModel
     }
+
+
+type alias NullstillBrukerModel =
+    { fnr : String
+    , requestStatus : RequestStatus
+    , error : Maybe Http.Error
+    }
+
+
+type RequestStatus
+    = IKKE_STARTET
+    | STARTET
+    | OK
+    | FEILET
 
 
 
@@ -25,7 +40,17 @@ type alias Model =
 
 init : () -> Url -> Nav.Key -> ( Model, Cmd Msg )
 init flags url navKey =
-    ( { fnr = "", startDato = "", sluttDato = "" }, Cmd.none )
+    ( { fnr = ""
+      , startDato = ""
+      , sluttDato = ""
+      , nullstillBruker =
+            { fnr = ""
+            , requestStatus = IKKE_STARTET
+            , error = Nothing
+            }
+      }
+    , Cmd.none
+    )
 
 
 
@@ -40,9 +65,24 @@ view model =
         , div [ class "skjema" ]
             [ h2 [ class "blokk-m typo-innholdstittel" ] [ text "Opprett sykmelding" ]
             , sykmeldingForm model
+            , h2 [ class "blokk-m typo-innholdstittel" ] [ text "Nullstill bruker" ]
+            , nullstillBrukerForm model
             ]
         ]
     }
+
+
+nullstillBrukerForm : Model -> Html Msg
+nullstillBrukerForm model =
+    let
+        requestStatus =
+            model.nullstillBruker.requestStatus
+    in
+    form [ onSubmit SubmitNullstillBruker ]
+        [ div [ class "blokk-m" ]
+            [ skjemaElement "Fødselsnummer" "text" model.nullstillBruker.fnr NullstillFnr ]
+        , button [ class "knapp knapp--hoved" ] [ text "Nullstill bruker" ]
+        ]
 
 
 sykmeldingForm : Model -> Html Msg
@@ -80,10 +120,13 @@ viewValidation model =
 
 type Msg
     = Fnr String
+    | NullstillFnr String
     | StartDato String
     | SluttDato String
     | SubmitOpprettSykmelding
+    | SubmitNullstillBruker
     | SykmeldingSendt (Result Http.Error (List String))
+    | BrukerNullstillt (Result Http.Error String)
     | NoOp
 
 
@@ -93,20 +136,62 @@ update msg model =
         Fnr fnr ->
             ( { model | fnr = fnr }, Cmd.none )
 
+        NullstillFnr fnr ->
+            ( { model
+                | nullstillBruker = { fnr = fnr, requestStatus = model.nullstillBruker.requestStatus, error = Nothing }
+              }
+            , Cmd.none
+            )
+
         StartDato startDato ->
             ( { model | startDato = startDato }, Cmd.none )
 
         SluttDato sluttDato ->
             ( { model | sluttDato = sluttDato }, Cmd.none )
 
-        SykmeldingSendt _ ->
-            ( model, Cmd.none )
-
         SubmitOpprettSykmelding ->
             ( model, postNySykmelding (lagSykmeldingBestilling model) )
 
+        SykmeldingSendt _ ->
+            ( model, Cmd.none )
+
+        SubmitNullstillBruker ->
+            ( { model
+                | nullstillBruker = { fnr = model.nullstillBruker.fnr, requestStatus = STARTET, error = Nothing }
+              }
+            , nullstillBruker model.nullstillBruker.fnr
+            )
+
+        BrukerNullstillt result ->
+            case result of
+                Ok _ ->
+                    ( { model | nullstillBruker = { fnr = "", requestStatus = OK, error = Nothing } }
+                    , Cmd.none
+                    )
+
+                Err error ->
+                    ( { model
+                        | nullstillBruker = { fnr = model.nullstillBruker.fnr, requestStatus = FEILET, error = Just error }
+                      }
+                    , Cmd.none
+                    )
+
         NoOp ->
             ( model, Cmd.none )
+
+
+lagMockUrl : String -> String
+lagMockUrl utvidelse =
+    String.append "https://syfomockproxy-q.nav.no" utvidelse
+
+
+nullstillBruker : String -> Cmd Msg
+nullstillBruker fnr =
+    post
+        { url = lagMockUrl (String.append "/person/" (String.append fnr "/nullstill"))
+        , body = Http.emptyBody
+        , expect = Http.expectJson BrukerNullstillt Decode.string
+        }
 
 
 postNySykmelding : SykmeldingBestilling -> Cmd Msg
