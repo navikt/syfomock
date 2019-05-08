@@ -1,6 +1,5 @@
 module Main exposing (main)
 
-import Api exposing (nullstillBruker)
 import Browser
 import Browser.Navigation as Nav
 import Felleskomponenter exposing (skjemaElement)
