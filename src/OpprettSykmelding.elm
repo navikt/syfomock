@@ -14,9 +14,9 @@ sykmeldingForm : Model -> Html Msg
 sykmeldingForm model =
     form [ onSubmit SubmitOpprettSykmelding ]
         [ div [ class "blokk-m" ]
-            [ skjemaElement "Fødselsnummer" "text" model.fnr Fnr
-            , skjemaElement "Startdato" "date" model.startDato StartDato
-            , skjemaElement "Sluttdato" "date" model.sluttDato SluttDato
+            [ skjemaElement "Fødselsnummer" "text" model.opprettSykmelding.fnr Fnr
+            , skjemaElement "Startdato" "date" model.opprettSykmelding.startDato StartDato
+            , skjemaElement "Sluttdato" "date" model.opprettSykmelding.sluttDato SluttDato
             ]
         , button [ class "knapp knapp--hoved" ] [ text "Opprett sykmelding" ]
         ]
@@ -39,14 +39,14 @@ postNySykmelding bestilling =
 
 lagSykmeldingBestilling : Model -> SykmeldingBestilling
 lagSykmeldingBestilling model =
-    { fnr = model.fnr
-    , syketilfelleStartDato = model.startDato
-    , identdato = model.startDato
-    , utstedelsesdato = model.startDato
+    { fnr = model.opprettSykmelding.fnr
+    , syketilfelleStartDato = model.opprettSykmelding.startDato
+    , identdato = model.opprettSykmelding.startDato
+    , utstedelsesdato = model.opprettSykmelding.startDato
     , smtype = "HUNDEREPROSENT"
     , perioder =
-        [ { fom = model.startDato
-          , tom = model.sluttDato
+        [ { fom = model.opprettSykmelding.startDato
+          , tom = model.opprettSykmelding.sluttDato
           , sykmeldingstype = HUNDREPROSENT
           }
         ]

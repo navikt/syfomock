@@ -4,10 +4,17 @@ import Http
 
 
 type alias Model =
+    { opprettSykmelding : OpprettSykmneldingModel
+    , nullstillBruker : NullstillBrukerModel
+    }
+
+
+type alias OpprettSykmneldingModel =
     { fnr : String
     , startDato : String
     , sluttDato : String
-    , nullstillBruker : NullstillBrukerModel
+    , requestStatus : RequestStatus
+    , error : Maybe Http.Error
     }
 
 

@@ -16,9 +16,13 @@ import Url exposing (Url)
 
 init : () -> Url -> Nav.Key -> ( Model, Cmd Msg )
 init flags url navKey =
-    ( { fnr = ""
-      , startDato = ""
-      , sluttDato = ""
+    ( { opprettSykmelding =
+            { fnr = ""
+            , startDato = ""
+            , sluttDato = ""
+            , requestStatus = IKKE_STARTET
+            , error = Nothing
+            }
       , nullstillBruker =
             { fnr = ""
             , requestStatus = IKKE_STARTET
@@ -56,20 +60,48 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Fnr fnr ->
-            ( { model | fnr = fnr }, Cmd.none )
+            let
+                opprettSykmelding =
+                    model.opprettSykmelding
+            in
+            ( { model
+                | opprettSykmelding = { opprettSykmelding | fnr = fnr }
+              }
+            , Cmd.none
+            )
 
         NullstillFnr fnr ->
+            let
+                nullstillBruker =
+                    model.nullstillBruker
+            in
             ( { model
-                | nullstillBruker = { fnr = fnr, requestStatus = model.nullstillBruker.requestStatus, error = Nothing }
+                | nullstillBruker = { nullstillBruker | fnr = fnr }
               }
             , Cmd.none
             )
 
         StartDato startDato ->
-            ( { model | startDato = startDato }, Cmd.none )
+            let
+                opprettSykmelding =
+                    model.opprettSykmelding
+            in
+            ( { model
+                | opprettSykmelding = { opprettSykmelding | startDato = startDato }
+              }
+            , Cmd.none
+            )
 
         SluttDato sluttDato ->
-            ( { model | sluttDato = sluttDato }, Cmd.none )
+            let
+                opprettSykmelding =
+                    model.opprettSykmelding
+            in
+            ( { model
+                | opprettSykmelding = { opprettSykmelding | sluttDato = sluttDato }
+              }
+            , Cmd.none
+            )
 
         SubmitOpprettSykmelding ->
             ( model, postNySykmelding (lagSykmeldingBestilling model) )
@@ -78,25 +110,34 @@ update msg model =
             ( model, Cmd.none )
 
         SubmitNullstillBruker ->
+            let
+                nullstillBrukerModel =
+                    model.nullstillBruker
+            in
             ( { model
-                | nullstillBruker = { fnr = model.nullstillBruker.fnr, requestStatus = STARTET, error = Nothing }
+                | nullstillBruker = { nullstillBrukerModel | requestStatus = STARTET }
               }
             , nullstillBruker model.nullstillBruker.fnr
             )
 
         BrukerNullstillt result ->
-            case result of
-                Ok _ ->
-                    ( { model | nullstillBruker = { fnr = "", requestStatus = OK, error = Nothing } }
-                    , Cmd.none
-                    )
+            let
+                nullstillBrukerModel =
+                    model.nullstillBruker
 
-                Err error ->
-                    ( { model
-                        | nullstillBruker = { fnr = model.nullstillBruker.fnr, requestStatus = FEILET, error = Just error }
-                      }
-                    , Cmd.none
-                    )
+                nullstillBruker =
+                    case result of
+                        Ok _ ->
+                            { nullstillBrukerModel | fnr = "", requestStatus = OK }
+
+                        Err error ->
+                            { nullstillBrukerModel | requestStatus = FEILET, error = Just error }
+            in
+            ( { model
+                | nullstillBruker = nullstillBruker
+              }
+            , Cmd.none
+            )
 
         NoOp ->
             ( model, Cmd.none )
