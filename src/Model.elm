@@ -1,6 +1,28 @@
-module Model exposing (Msg(..), Sykemeldingstype(..), SykmeldingBestilling, SykmeldingPeriode)
+module Model exposing (Model, Msg(..), NullstillBrukerModel, RequestStatus(..), Sykemeldingstype(..), SykmeldingBestilling, SykmeldingPeriode)
 
 import Http
+
+
+type alias Model =
+    { fnr : String
+    , startDato : String
+    , sluttDato : String
+    , nullstillBruker : NullstillBrukerModel
+    }
+
+
+type alias NullstillBrukerModel =
+    { fnr : String
+    , requestStatus : RequestStatus
+    , error : Maybe Http.Error
+    }
+
+
+type RequestStatus
+    = IKKE_STARTET
+    | STARTET
+    | OK
+    | FEILET
 
 
 type Msg

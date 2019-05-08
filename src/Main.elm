@@ -3,6 +3,7 @@ module Main exposing (main)
 import Api exposing (nullstillBruker)
 import Browser
 import Browser.Navigation as Nav
+import Felleskomponenter exposing (skjemaElement)
 import Html exposing (..)
 import Html.Attributes exposing (class, style, type_, value)
 import Html.Events exposing (onInput, onSubmit)
@@ -10,29 +11,8 @@ import Http exposing (post)
 import Json.Decode as Decode
 import Json.Encode as Encode
 import Model exposing (..)
+import NullstillBruker exposing (nullstillBruker, nullstillBrukerForm)
 import Url exposing (Url)
-
-
-type alias Model =
-    { fnr : String
-    , startDato : String
-    , sluttDato : String
-    , nullstillBruker : NullstillBrukerModel
-    }
-
-
-type alias NullstillBrukerModel =
-    { fnr : String
-    , requestStatus : RequestStatus
-    , error : Maybe Http.Error
-    }
-
-
-type RequestStatus
-    = IKKE_STARTET
-    | STARTET
-    | OK
-    | FEILET
 
 
 
@@ -73,19 +53,6 @@ view model =
     }
 
 
-nullstillBrukerForm : Model -> Html Msg
-nullstillBrukerForm model =
-    let
-        requestStatus =
-            model.nullstillBruker.requestStatus
-    in
-    form [ onSubmit SubmitNullstillBruker ]
-        [ div [ class "blokk-m" ]
-            [ skjemaElement "Fødselsnummer" "text" model.nullstillBruker.fnr NullstillFnr ]
-        , button [ class "knapp knapp--hoved" ] [ text "Nullstill bruker" ]
-        ]
-
-
 sykmeldingForm : Model -> Html Msg
 sykmeldingForm model =
     form [ onSubmit SubmitOpprettSykmelding ]
@@ -96,23 +63,6 @@ sykmeldingForm model =
             ]
         , button [ class "knapp knapp--hoved" ] [ text "Opprett sykmelding" ]
         ]
-
-
-skjemaElement : String -> String -> String -> (String -> msg) -> Html msg
-skjemaElement inputLabel inputType inputValue toMsg =
-    div [ class "skjemaelement skjemaelement__fullbredde" ]
-        [ label [ class "skjemaelement__label" ] [ text inputLabel ]
-        , input [ type_ inputType, value inputValue, onInput toMsg, class "skjemaelement__input input--fullbredde" ] []
-        ]
-
-
-viewValidation : Model -> Html msg
-viewValidation model =
-    if String.length model.fnr == 11 then
-        div [ style "color" "green" ] [ text "OK" ]
-
-    else
-        div [ style "color" "red" ] [ text "Feil lengde på fødselsnummer" ]
 
 
 
