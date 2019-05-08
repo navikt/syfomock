@@ -106,8 +106,20 @@ update msg model =
         SubmitOpprettSykmelding ->
             ( model, postNySykmelding (lagSykmeldingBestilling model) )
 
-        SykmeldingSendt _ ->
-            ( model, Cmd.none )
+        SykmeldingSendt result ->
+            let
+                opprettSykmeldingModel =
+                    model.opprettSykmelding
+
+                opprettSykmelding =
+                    case result of
+                        Ok _ ->
+                            { opprettSykmeldingModel | requestStatus = OK, fnr = "", startDato = "", sluttDato = "" }
+
+                        Err error ->
+                            { opprettSykmeldingModel | requestStatus = FEILET, error = Just error }
+            in
+            ( { model | opprettSykmelding = opprettSykmelding }, Cmd.none )
 
         SubmitNullstillBruker ->
             let
