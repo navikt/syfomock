@@ -1,4 +1,18 @@
-module Model exposing (Sykemeldingstype(..), SykmeldingBestilling, SykmeldingPeriode)
+module Model exposing (Msg(..), Sykemeldingstype(..), SykmeldingBestilling, SykmeldingPeriode)
+
+import Http
+
+
+type Msg
+    = Fnr String
+    | NullstillFnr String
+    | StartDato String
+    | SluttDato String
+    | SubmitOpprettSykmelding
+    | SubmitNullstillBruker
+    | SykmeldingSendt (Result Http.Error (List String))
+    | BrukerNullstillt (Result Http.Error String)
+    | NoOp
 
 
 type alias SykmeldingBestilling =

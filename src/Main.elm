@@ -1,5 +1,6 @@
 module Main exposing (main)
 
+import Api exposing (nullstillBruker)
 import Browser
 import Browser.Navigation as Nav
 import Html exposing (..)
@@ -118,18 +119,6 @@ viewValidation model =
 -- UPDATE
 
 
-type Msg
-    = Fnr String
-    | NullstillFnr String
-    | StartDato String
-    | SluttDato String
-    | SubmitOpprettSykmelding
-    | SubmitNullstillBruker
-    | SykmeldingSendt (Result Http.Error (List String))
-    | BrukerNullstillt (Result Http.Error String)
-    | NoOp
-
-
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -178,20 +167,6 @@ update msg model =
 
         NoOp ->
             ( model, Cmd.none )
-
-
-lagMockUrl : String -> String
-lagMockUrl utvidelse =
-    String.append "https://syfomockproxy-q.nav.no" utvidelse
-
-
-nullstillBruker : String -> Cmd Msg
-nullstillBruker fnr =
-    post
-        { url = lagMockUrl (String.append "/person/" (String.append fnr "/nullstill"))
-        , body = Http.emptyBody
-        , expect = Http.expectJson BrukerNullstillt Decode.string
-        }
 
 
 postNySykmelding : SykmeldingBestilling -> Cmd Msg
