@@ -81,7 +81,7 @@ postNySykmelding bestilling =
     post
         { url = lagMockUrl "/sykmelding"
         , body = body
-        , expect = Http.expectJson SykmeldingSendt (Decode.list Decode.string)
+        , expect = Http.expectJson SykmeldingSendt Decode.string
         }
 
 

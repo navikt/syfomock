@@ -39,7 +39,7 @@ type Msg
     | SluttDato String
     | SubmitOpprettSykmelding
     | SubmitNullstillBruker
-    | SykmeldingSendt (Result Http.Error (List String))
+    | SykmeldingSendt (Result Http.Error String)
     | BrukerNullstillt (Result Http.Error String)
     | NoOp
 
