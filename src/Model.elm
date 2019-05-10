@@ -1,4 +1,13 @@
-module Model exposing (Model, Msg(..), NullstillBrukerModel, RequestStatus(..), Sykemeldingstype(..), SykmeldingBestilling, SykmeldingPeriode)
+module Model exposing
+    ( Model
+    , Msg(..)
+    , NullstillBrukerModel
+    , OpprettSykmneldingModel
+    , RequestStatus(..)
+    , SykmeldingBestilling
+    , SykmeldingPeriode
+    , Sykmeldingstype(..)
+    )
 
 import Http
 
@@ -11,10 +20,16 @@ type alias Model =
 
 type alias OpprettSykmneldingModel =
     { fnr : String
-    , startDato : String
-    , sluttDato : String
+    , periode : OpprettSykmeldingPeriode
     , requestStatus : RequestStatus
     , error : Maybe Http.Error
+    }
+
+
+type alias OpprettSykmeldingPeriode =
+    { startDato : String
+    , sluttDato : String
+    , sykmeldingstype : Sykmeldingstype
     }
 
 
@@ -33,10 +48,11 @@ type RequestStatus
 
 
 type Msg
-    = Fnr String
-    | NullstillFnr String
+    = NullstillFnr String
+    | Fnr String
     | StartDato String
     | SluttDato String
+    | PeriodeSykmeldingstype String
     | SubmitOpprettSykmelding
     | SubmitNullstillBruker
     | SykmeldingSendt (Result Http.Error String)
@@ -58,11 +74,11 @@ type alias SykmeldingBestilling =
 type alias SykmeldingPeriode =
     { fom : String
     , tom : String
-    , sykmeldingstype : Sykemeldingstype
+    , sykmeldingstype : Sykmeldingstype
     }
 
 
-type Sykemeldingstype
+type Sykmeldingstype
     = AVVENTENDE
     | GRADERT_20
     | GRADERT_40

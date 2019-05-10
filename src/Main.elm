@@ -6,7 +6,14 @@ import Html exposing (..)
 import Html.Attributes exposing (class)
 import Model exposing (..)
 import NullstillBruker exposing (nullstillBruker, nullstillBrukerForm)
-import OpprettSykmelding exposing (lagSykmeldingBestilling, postNySykmelding, sykmeldingForm)
+import OpprettSykmelding
+    exposing
+        ( lagSykmeldingBestilling
+        , opprettSykmeldingDefaulState
+        , postNySykmelding
+        , stringTilSykmeldingstype
+        , sykmeldingForm
+        )
 import Url exposing (Url)
 
 
@@ -16,13 +23,7 @@ import Url exposing (Url)
 
 init : () -> Url -> Nav.Key -> ( Model, Cmd Msg )
 init flags url navKey =
-    ( { opprettSykmelding =
-            { fnr = ""
-            , startDato = ""
-            , sluttDato = ""
-            , requestStatus = IKKE_STARTET
-            , error = Nothing
-            }
+    ( { opprettSykmelding = opprettSykmeldingDefaulState
       , nullstillBruker =
             { fnr = ""
             , requestStatus = IKKE_STARTET
@@ -85,9 +86,12 @@ update msg model =
             let
                 opprettSykmelding =
                     model.opprettSykmelding
+
+                periode =
+                    opprettSykmelding.periode
             in
             ( { model
-                | opprettSykmelding = { opprettSykmelding | startDato = startDato }
+                | opprettSykmelding = { opprettSykmelding | periode = { periode | startDato = startDato } }
               }
             , Cmd.none
             )
@@ -96,9 +100,26 @@ update msg model =
             let
                 opprettSykmelding =
                     model.opprettSykmelding
+
+                periode =
+                    opprettSykmelding.periode
             in
             ( { model
-                | opprettSykmelding = { opprettSykmelding | sluttDato = sluttDato }
+                | opprettSykmelding = { opprettSykmelding | periode = { periode | sluttDato = sluttDato } }
+              }
+            , Cmd.none
+            )
+
+        PeriodeSykmeldingstype sykmeldingstype ->
+            let
+                opprettSykmelding =
+                    model.opprettSykmelding
+
+                periode =
+                    opprettSykmelding.periode
+            in
+            ( { model
+                | opprettSykmelding = { opprettSykmelding | periode = { periode | sykmeldingstype = stringTilSykmeldingstype sykmeldingstype } }
               }
             , Cmd.none
             )
@@ -114,7 +135,7 @@ update msg model =
                 opprettSykmelding =
                     case result of
                         Ok _ ->
-                            { opprettSykmeldingModel | requestStatus = OK, fnr = "", startDato = "", sluttDato = "" }
+                            { opprettSykmeldingDefaulState | requestStatus = OK }
 
                         Err error ->
                             { opprettSykmeldingModel | requestStatus = FEILET, error = Just error }
