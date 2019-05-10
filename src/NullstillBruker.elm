@@ -24,6 +24,22 @@ nullstillBrukerForm model =
         requestStatus =
             model.nullstillBruker.requestStatus
 
+        formClass =
+            case requestStatus of
+                FEILET ->
+                    "skjema__feilomrade--harFeil"
+
+                _ ->
+                    "skjema__feilomrade"
+
+        suksessmelding =
+            case requestStatus of
+                OK ->
+                    alertStripeSuksess "Bruker nullstillt"
+
+                _ ->
+                    div [] []
+
         submitknapp =
             case requestStatus of
                 STARTET ->
@@ -36,26 +52,10 @@ nullstillBrukerForm model =
                 _ ->
                     button [ class "knapp knapp--hoved" ] [ text "Nullstill bruker" ]
 
-        formClass =
-            case requestStatus of
-                FEILET ->
-                    "skjema__feilomrade--harFeil"
-
-                _ ->
-                    "skjema__feilomrade"
-
         feilmelding =
             case requestStatus of
                 FEILET ->
                     div [ class "skjemaelement__feilmelding" ] [ text "Kunne ikke nullstille bruker" ]
-
-                _ ->
-                    div [] []
-
-        suksessmelding =
-            case requestStatus of
-                OK ->
-                    alertStripeSuksess "Bruker nullstillt"
 
                 _ ->
                     div [] []

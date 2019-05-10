@@ -1,6 +1,6 @@
 module OpprettSykmelding exposing (lagSykmeldingBestilling, postNySykmelding, sykmeldingBestillingEncoder, sykmeldingForm, sykmeldingsperiodeEncoder, sykmeldingstypeEncoder)
 
-import Felleskomponenter exposing (lagMockUrl, skjemaElement)
+import Felleskomponenter exposing (alertStripeSuksess, lagMockUrl, skjemaElement)
 import Html exposing (Html, button, div, form, span, text)
 import Html.Attributes exposing (class, disabled)
 import Html.Events exposing (onSubmit)
@@ -16,40 +16,33 @@ sykmeldingForm model =
         requestStatus =
             model.opprettSykmelding.requestStatus
 
-        buttonBaseClasses =
-            "knapp knapp--hoved"
-
-        buttonClass =
-            case requestStatus of
-                STARTET ->
-                    buttonBaseClasses ++ " knapp--spinner knapp--disabled"
-
-                _ ->
-                    buttonBaseClasses
-
-        buttonDisabled =
-            case requestStatus of
-                STARTET ->
-                    True
-
-                _ ->
-                    False
-
-        knappinnhold =
-            case requestStatus of
-                STARTET ->
-                    [ text "Opprett sykmelding", span [ class "knapp__spinner" ] [] ]
-
-                _ ->
-                    [ text "Opprett sykmelding" ]
-
         formClass =
             case requestStatus of
                 FEILET ->
-                    "skjema__feilomrade--harFeil"
+                    "skjema__feilomrade skjema__feilomrade--harFeil"
 
                 _ ->
                     "skjema__feilomrade"
+
+        suksessmelding =
+            case requestStatus of
+                OK ->
+                    alertStripeSuksess "Bruker nullstillt"
+
+                _ ->
+                    div [] []
+
+        submitknapp =
+            case requestStatus of
+                STARTET ->
+                    button
+                        [ class "knapp knapp--hoved knapp--spinner knapp--disabled", disabled True ]
+                        [ text "Opprett sykmelding"
+                        , span [ class "knapp__spinner" ] []
+                        ]
+
+                _ ->
+                    button [ class "knapp knapp--hoved" ] [ text "Opprett sykmelding" ]
 
         feilmelding =
             case requestStatus of
@@ -60,12 +53,13 @@ sykmeldingForm model =
                     div [] []
     in
     form [ onSubmit SubmitOpprettSykmelding, class formClass ]
-        [ div [ class "blokk-m" ]
+        [ suksessmelding
+        , div [ class "blokk-m" ]
             [ skjemaElement "Fødselsnummer" "text" model.opprettSykmelding.fnr Fnr
             , skjemaElement "Startdato" "date" model.opprettSykmelding.startDato StartDato
             , skjemaElement "Sluttdato" "date" model.opprettSykmelding.sluttDato SluttDato
             ]
-        , button [ class buttonClass, disabled buttonDisabled ] knappinnhold
+        , submitknapp
         , feilmelding
         ]
 
