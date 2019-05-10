@@ -1,6 +1,6 @@
 module NullstillBruker exposing (nullstillBruker, nullstillBrukerForm)
 
-import Felleskomponenter exposing (lagMockUrl, skjemaElement)
+import Felleskomponenter exposing (alertStripeSuksess, lagMockUrl, skjemaElement)
 import Html exposing (Html, button, div, form, span, text)
 import Html.Attributes exposing (class, disabled)
 import Html.Events exposing (onSubmit)
@@ -24,32 +24,17 @@ nullstillBrukerForm model =
         requestStatus =
             model.nullstillBruker.requestStatus
 
-        buttonBaseClasses =
-            "knapp knapp--hoved"
-
-        buttonClass =
+        submitknapp =
             case requestStatus of
                 STARTET ->
-                    buttonBaseClasses ++ " knapp--spinner knapp--disabled"
+                    button
+                        [ class "knapp knapp--hoved knapp--spinner knapp--disabled", disabled True ]
+                        [ text "Nullstill bruker"
+                        , span [ class "knapp__spinner" ] []
+                        ]
 
                 _ ->
-                    buttonBaseClasses
-
-        buttonDisabled =
-            case requestStatus of
-                STARTET ->
-                    True
-
-                _ ->
-                    False
-
-        knappinnhold =
-            case requestStatus of
-                STARTET ->
-                    [ text "Nullstill bruker", span [ class "knapp__spinner" ] [] ]
-
-                _ ->
-                    [ text "Nullstill bruker" ]
+                    button [ class "knapp knapp--hoved" ] [ text "Nullstill bruker" ]
 
         formClass =
             case requestStatus of
@@ -66,10 +51,19 @@ nullstillBrukerForm model =
 
                 _ ->
                     div [] []
+
+        suksessmelding =
+            case requestStatus of
+                OK ->
+                    alertStripeSuksess "Bruker nullstillt"
+
+                _ ->
+                    div [] []
     in
     form [ onSubmit SubmitNullstillBruker, class formClass ]
-        [ div [ class "blokk-m" ]
+        [ suksessmelding
+        , div [ class "blokk-m" ]
             [ skjemaElement "Fødselsnummer" "text" model.nullstillBruker.fnr NullstillFnr ]
-        , button [ class buttonClass, disabled buttonDisabled ] knappinnhold
+        , submitknapp
         , feilmelding
         ]
